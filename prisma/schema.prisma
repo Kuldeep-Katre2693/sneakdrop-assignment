@@ -1,0 +1,108 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum HoldStatus {
+  ACTIVE
+  EXPIRED
+  CONVERTED
+  CANCELLED
+}
+
+enum OrderStatus {
+  PAID
+  FAILED
+}
+
+enum QueueStatus {
+  WAITING
+  PROMOTED
+  CANCELLED
+}
+
+enum PaymentEventType {
+  SUCCEEDED
+  FAILED
+}
+
+model User {
+  id             String        @id @default(cuid())
+  externalId     String        @unique
+  totalPurchased Int           @default(0)
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  holds          Hold[]
+  orders         Order[]
+  queueEntries   QueueEntry[]
+
+  @@index([externalId])
+}
+
+model Inventory {
+  id             Int           @id @default(1)
+  totalStock     Int           @default(20)
+  availableStock Int           @default(20)
+  updatedAt      DateTime      @updatedAt
+}
+
+model Hold {
+  id             String         @id @default(cuid())
+  userId         String
+  status         HoldStatus     @default(ACTIVE)
+  createdAt      DateTime       @default(now())
+  expiresAt      DateTime
+
+  user           User           @relation(fields: [userId], references: [id])
+  order          Order?
+  paymentEvents  PaymentEvent[]
+
+  @@index([userId, status])
+  @@index([status, expiresAt])
+}
+
+model Order {
+  id          String       @id @default(cuid())
+  userId      String
+  holdId      String       @unique
+  status      OrderStatus  @default(PAID)
+  createdAt   DateTime     @default(now())
+  paidAt      DateTime     @default(now())
+
+  user        User         @relation(fields: [userId], references: [id])
+  hold        Hold         @relation(fields: [holdId], references: [id])
+
+  @@index([userId])
+}
+
+model QueueEntry {
+  id          String       @id @default(cuid())
+  userId      String
+  status      QueueStatus  @default(WAITING)
+  createdAt   DateTime     @default(now())
+  promotedAt  DateTime?
+
+  user        User         @relation(fields: [userId], references: [id])
+
+  @@index([status, createdAt])
+  @@index([userId, status])
+}
+
+model PaymentEvent {
+  id               String            @id @default(cuid())
+  externalEventId  String            @unique
+  holdId           String
+  type             PaymentEventType
+  eventCreatedAt   DateTime
+  receivedAt      DateTime          @default(now())
+  payload          Json?
+
+  hold             Hold              @relation(fields: [holdId], references: [id])
+
+  @@index([holdId])
+}
