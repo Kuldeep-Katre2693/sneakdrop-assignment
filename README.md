@@ -1,23 +1,36 @@
-# Sneaker Drop
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-A small shoe brand is launching one limited sneaker. They only have 20 pairs. When the sale opens, thousands of people will click Buy at the same second.
+## Getting Started
 
-Last time, their website sold 51 pairs when they only had 20, and they had to refund 31 people. Your job is to build the full system for the next sale so this never happens again.
+First, run the development server:
 
-## The rules
+```bash
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
+```
 
-1. When a user clicks Buy, one pair is held for them for 5 minutes. If they don't pay in time, the pair goes back to stock.
-2. A user can hold only 1 pair at a time, and can buy a maximum of 2 pairs in total.
-3. If stock is 0, users can join a waiting line. When someone's hold runs out, the first person in line automatically gets that pair, with their own 5 minutes.
-4. Payments are fake. You don't need to build a real payment system, just make your own simple fake one that sends your app a "payment succeeded" message, like a real payment company would. Real ones are messy, so sometimes the message comes late, sometimes twice, sometimes in the wrong order.
-5. One page shows the pairs left, the user's hold countdown, and their place in the waiting line. It doesn't need to look good, plain text is fine.
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-Use any language or tools you are comfortable with.
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-## What you send back
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-1. Your code (repo or zip)
-2. A NOTES.md file that tells how to run the project, and any other requirements that are needed
-3. A screen recording (Loom or any tool you like) where you explain your project
+## Learn More
 
-Please fork this repo and build your project in your fork.
+To learn more about Next.js, take a look at the following resources:
+
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+
+## Deploy on Vercel
+
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
