@@ -1,36 +1,107 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# SneakDrop
 
-## Getting Started
+A concurrency-safe limited sneaker drop system built with Next.js, TypeScript, Prisma, and PostgreSQL.
 
-First, run the development server:
+## Problem
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+The store has only 20 sneaker pairs, but thousands of users may click Buy simultaneously.
+
+The system must guarantee that the store never sells more pairs than are available while supporting temporary holds, automatic expiry, a FIFO waiting queue, and unreliable payment events.
+
+## Tech Stack
+
+- Next.js
+- TypeScript
+- PostgreSQL
+- Prisma
+- REST APIs
+- Tailwind CSS
+- Git/GitHub
+
+## Core Features
+
+### Limited Inventory
+
+The system starts with 20 available pairs.
+
+### Five-Minute Holds
+
+A successful Buy request creates a five-minute hold.
+
+### User Purchase Rules
+
+- One active hold per user.
+- Maximum two completed purchases per user.
+
+### FIFO Waiting Queue
+
+When inventory reaches zero, new users are placed in a first-in, first-out waiting queue.
+
+When an active hold expires, the first waiting user automatically receives a new five-minute hold.
+
+### Fake Payment System
+
+The application includes a fake payment provider that can deliver:
+
+- delayed payments
+- duplicate events
+- out-of-order events
+
+Payment processing is idempotent and expired holds cannot be resurrected by late payments.
+
+### Concurrency Protection
+
+The Buy transaction uses PostgreSQL row locking to protect the limited inventory from concurrent requests.
+
+A dedicated concurrency test sends 100 simultaneous Buy requests and verifies that exactly 20 reservations are created.
+
+## Architecture
+
+```text
+Next.js UI
+    |
+    | REST API
+    v
+Next.js Route Handlers
+    |
+    v
+Service Layer
+    |
+    v
+Prisma
+    |
+    v
+PostgreSQL
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Running the Project
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+See [NOTES.md](./NOTES.md) for complete setup instructions.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Basic startup:
 
-## Learn More
+```bash
+npm install
+npx prisma generate
+npx prisma migrate dev
+npm run dev
+```
 
-To learn more about Next.js, take a look at the following resources:
+Open:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```text
+http://localhost:3000
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Testing
 
-## Deploy on Vercel
+```bash
+npm run lint
+npm run test:concurrency
+npm run test:payments
+npm run build
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Assignment
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+The original assignment specification is preserved in [ASSIGNMENT.md](./ASSIGNMENT.md).
