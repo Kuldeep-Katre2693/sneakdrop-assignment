@@ -2,12 +2,13 @@
   "name": "sneakdrop-assignment",
   "version": "0.1.0",
   "private": true,
-    "type": "module",
+  "type": "module",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test:concurrency": "tsx scripts/concurrency-test.ts"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.10.0",
@@ -28,6 +29,7 @@
     "eslint-config-next": "16.3.8",
     "prisma": "^7.10.0",
     "tailwindcss": "^4",
+    "tsx": "^4.23.15",
     "typescript": "^5"
   }
 }

@@ -33,10 +33,6 @@ type StatusResponse = {
   queue: QueueStatus;
 };
 
-type ApiError = {
-  success: false;
-  message: string;
-};
 
 function formatCountdown(seconds: number) {
   const safeSeconds = Math.max(0, seconds);
@@ -62,59 +58,49 @@ export default function Home() {
   const [error, setError] = useState("");
 
   const loadStatus = useCallback(async (userId: string) => {
-    if (!userId) return;
+  if (!userId) return;
 
-    try {
-      const response = await fetch(
-        `/api/status/${encodeURIComponent(userId)}`,
-        {
-          cache: "no-store",
-        }
-      );
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || "Unable to load status");
+  try {
+    const response = await fetch(
+      `/api/status/${encodeURIComponent(userId)}`,
+      {
+        cache: "no-store",
       }
-
-      setStatus(data);
-      setError("");
-    } catch (err) {
-      console.error(err);
-
-      if (!status) {
-        setError(
-          err instanceof Error
-            ? err.message
-            : "Unable to load user status"
-        );
-      }
-    }
-  }, [status]);
-
-  useEffect(() => {
-    const storedUserId = window.localStorage.getItem(
-      "sneakdrop-user-id"
     );
 
-    if (storedUserId) {
-      setExternalUserId(storedUserId);
-      setCurrentUserId(storedUserId);
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(
+        data.message || "Unable to load status"
+      );
     }
-  }, []);
+
+    setStatus(data);
+    setError("");
+  } catch (err) {
+    console.error("Status request failed:", err);
+
+    setError(
+      err instanceof Error
+        ? err.message
+        : "Unable to load user status"
+    );
+  }
+}, []);
+
 
   useEffect(() => {
-    if (!currentUserId) return;
+  if (!currentUserId) return;
 
-    loadStatus(currentUserId);
+  const interval = window.setInterval(() => {
+    void loadStatus(currentUserId);
+  }, 2000);
 
-    const interval = window.setInterval(() => {
-      loadStatus(currentUserId);
-    }, 2000);
-
-    return () => window.clearInterval(interval);
-  }, [currentUserId, loadStatus]);
+  return () => {
+    window.clearInterval(interval);
+  };
+}, [currentUserId, loadStatus]);
 
   async function createOrLoadUser() {
     const userId = externalUserId.trim();
@@ -146,11 +132,6 @@ export default function Home() {
           data.message || "Unable to create user"
         );
       }
-
-      window.localStorage.setItem(
-        "sneakdrop-user-id",
-        userId
-      );
 
       setCurrentUserId(userId);
 
